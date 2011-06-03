@@ -1,0 +1,30 @@
+body {
+  font-family: "Lucida Grande", tahoma, sans-serif;
+  font-size: 100%;
+  margin: 0;
+  width: 100%;
+}
+
+#main {
+  border: solid black 2px;
+  height: 600px;
+  position: relative;
+}
+
+div.function {
+  background-color: green;
+  height: 100px;
+  position: absolute;
+  width: 200px;
+}
+div.function a {
+  bottom: 1px;
+  display: block;
+  position: absolute;
+}
+div.function a.left {
+  left: 1px;
+}
+div.function a.right {
+  right: 1px;
+}
