@@ -9,19 +9,50 @@ j(function() {
   var paper = window.paper = Raphael('main', width, height);
   var p = paper.rect(0, 0, width, height).attr({fill: 'white'});
 
-  p.click(function(ev) {
-      create_box(ev.x, ev.y);
-  });
+  //p.click(function(ev) {
+      //create_box(ev.x, ev.y);
+  //});
+
+  var w         = create_title_bar(width, height);
+  window.wbar   = w.bar;
+  window.wfname = w.function_name;
+
+  create_box(width/2-50, height/2-100);
 });
+
+function create_title_bar(width, height) {
+
+  var bar = paper.rect(0, 0, width, 60, 0);
+
+  bar.attr({
+    gradient:           '90-#526c7a-#64a0c1',
+    stroke:             '#3b4449',
+    'stroke-width':     3,
+    'stroke-linejoin':  'round',
+  });
+
+  var function_name = paper.text(width/2, 30, 'Function').attr({
+    'font-family':  'Lucida Grande',
+    'font-weight':  'bold',
+    'font-size':    30,
+    'fill':         'white'
+  });
+
+  return {bar: bar, function_name: function_name};
+}
 
 function create_box(x, y) {
 
+  var width = 150;
+
   var box = {
-    rect:  paper.rect(x, y, 100, 50, 10).attr({fill: 'green'}),
-    top:   paper.circle(x+50, y+0, 7).attr({fill: 'red'}),
+    rect:  paper.rect(x, y, width, 50, 10).attr({fill: 'green'}),
+    top:   paper.circle(x+width/2, y+0, 7).attr({fill: 'red'}),
     left:  paper.circle(x+0, y+50, 7).attr({fill: 'red'}),
-    right: paper.circle(x+100, y+50, 7).attr({fill: 'red'})
+    right: paper.circle(x+width, y+50, 7).attr({fill: 'red'})
   };
+
+  //set_box_width(box, width);
 
   box.rect.attr({
     gradient:           '90-#526c7a-#64a0c1',
@@ -31,6 +62,18 @@ function create_box(x, y) {
   });
 
   return assign_events(box);
+}
+
+function set_box_width(box, width) {
+
+  box.rect.attr({width: width});
+
+  box.top.attr(
+      {cx: box.rect.attr('x')+box.rect.attr('width')/2});;
+
+  box.right.attr(
+      {cx: box.rect.attr('x')+box.rect.attr('width')});;
+  return box;
 }
 
 function assign_events(box) {
@@ -76,14 +119,27 @@ function assign_child_spawn_events(box) {
   var left  = box.left;
   var right = box.right;
 
+  var x_offset = 20;
+  var y_offset = 30;
+
   left.click(function(ev) {
     link_to_parent(
-      box, 'left', create_box(left.attrs.cx-120, left.attrs.cy+30));
+      box, 'left',
+      create_box(
+        left.attrs.cx-x_offset-box.rect.attr('width'),
+        left.attrs.cy+y_offset));
+
+      this.unclick(this.events[0].f);
     }); 
 
   right.click(function(ev) {
     link_to_parent(
-      box, 'right', create_box(right.attrs.cx+20, right.attrs.cy+30));
+      box, 'right',
+      create_box(
+        right.attrs.cx+x_offset,
+        right.attrs.cy+y_offset));
+
+      this.unclick(this.events[0].f);
     }); 
 
   return box;
