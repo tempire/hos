@@ -49,9 +49,9 @@ function create_box(x, y) {
 
   var box = {
     rect:  paper.rect(x, y, 100, 50, 10).attr({fill: 'green'}),
-    top:   paper.circle(x+50, y+0, 10).attr({fill: 'red'}),
-    left:  paper.circle(x+0, y+50, 10).attr({fill: 'red'}),
-    right: paper.circle(x+100, y+50, 10).attr({fill: 'red'})
+    top:   paper.circle(x+50, y+0, 7).attr({fill: 'red'}),
+    left:  paper.circle(x+0, y+50, 7).attr({fill: 'red'}),
+    right: paper.circle(x+100, y+50, 7).attr({fill: 'red'})
   };
 
   box.rect.attr({
@@ -91,6 +91,11 @@ function link_to_parent(box, which, child) {
 
   box[which + 'Link'] = link;
   child.parentLink    = link;
+
+  child.top.toFront();
+  box.rect.toFront();
+  box.right.toFront();
+  box.left.toFront();
 }
 
 function assign_child_spawn_events(box) {
