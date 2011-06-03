@@ -194,6 +194,8 @@ function move(box, x, y) {
     }
   });
 
+  if (box.parentLink == undefined) return box;
+
   // Move parent link along with child
   var plink  = box.parentLink;
   var xSrc  = plink.attrs.path[0][1];
