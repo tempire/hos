@@ -1,36 +1,5 @@
 var j = window.j = jQuery;
 
-/*
-{
-  parent: null,
-  node: 'box',
-  construct: 'join',
-  left: {
-    parent:  
-    node: 'box',
-    ...
-  },
-  right: {
-    parent: null
-    node: 'box',
-    ...
-  }
-}
-
-[
-  box,
-  [construct],
-  left,
-  [
-    box,
-    [construct],
-    left,
-    right
-  ]
-]
-*/
-
-
 j(function() {
 
   var main   = j('#main');
