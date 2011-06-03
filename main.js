@@ -87,7 +87,11 @@ function link_to_parent(box, which, child) {
     'M'+fromx+' '+fromy
     +' '+
     'L'+tox+' '+toy
-  );
+  ).attr({
+    'stroke-width':    3,
+    'stroke-linejoin': 'round',
+     stroke:           '#3b4449'
+  });
 
   box[which + 'Link'] = link;
   child.parentLink    = link;
