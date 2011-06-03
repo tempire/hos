@@ -39,8 +39,6 @@ j(function() {
 
   var paper = window.paper = Raphael('main', width, height);
   var p = paper.rect(0, 0, width, height).attr({fill: 'white'});
-  var path = paper.path('M100 100 L200 200');
-  path.attr.dx = 300;
 
   p.click(function(ev) {
       create_box(ev.x, ev.y);
@@ -63,28 +61,27 @@ function create_box(x, y) {
     'stroke-linejoin':  'round',
   });
 
-  box = assign_events(box);
-
-  return box;
+  return assign_events(box);
 }
 
 function assign_events(box) {
 
   return assign_drag_events(
-      box, assign_child_spawn_events(box));
+    box, assign_child_spawn_events(box));
 }
 
 function link_to_parent(box, which, child) {
 
   var parent = box[which];
+
   box[which + 'Child'] = child;
   box.parent = parent;
 
   var fromx = parent.attrs.cx;
   var fromy = parent.attrs.cy;
 
-  var tox = child.attrs.cx;
-  var toy = child.attrs.cy;
+  var tox = child.top.attrs.cx;
+  var toy = child.top.attrs.cy;
 
   var link = paper.path(
     'M'+fromx+' '+fromy
@@ -93,6 +90,7 @@ function link_to_parent(box, which, child) {
   );
 
   box[which + 'Link'] = link;
+  child.parentLink    = link;
 }
 
 function assign_child_spawn_events(box) {
@@ -102,12 +100,12 @@ function assign_child_spawn_events(box) {
 
   left.click(function(ev) {
     link_to_parent(
-      box, 'left', create_box(left.attrs.cx-120, left.attrs.cy+30).top);
+      box, 'left', create_box(left.attrs.cx-120, left.attrs.cy+30));
     }); 
 
   right.click(function(ev) {
     link_to_parent(
-      box, 'right', create_box(right.attrs.cx+20, right.attrs.cy+30).top);
+      box, 'right', create_box(right.attrs.cx+20, right.attrs.cy+30));
     }); 
 
   return box;
@@ -117,55 +115,101 @@ function assign_drag_events(box) {
 
   var rect  = box.rect;
 
-  var
-    start = function() {
-      rect.ox = rect.attr('x');
-      rect.oy = rect.attr('y');
-      rect.attr({opacity: .5});
+  rect.drag(
+    function(x, y)  { move(box, x, y) },
+    function()      { start(box) },
+    function()      { up(box) }
+  );
 
-      // Connector handles
-      ['top', 'left', 'right'].forEach(function(circle) {
-        box[circle].ox = box[circle].attr('cx');
-        box[circle].oy = box[circle].attr('cy');
-        box[circle].attr({opacity: .8});
-      });
+  return box;
+}
 
-      ['leftLink', 'rightLink'].forEach(function(line) {
-        if (box[line] == undefined)
-          return;
+function start(box) {
 
-        box[line].ox = 0;
-        box[line].oy = 0;
-        box[line].attr({opacity: .8});
-      });
-    },
-    move = function(x, y) {
-      rect.attr({x: rect.ox + x, y: rect.oy + y});
-      rect.attr({x: rect.ox + x, y: rect.oy + y});
+  if (box.isMoving) return box;
 
-      // Connector handles
-      ['top', 'left', 'right'].forEach(function(circle) {
-        box[circle].attr({cx: box[circle].ox + x, cy: box[circle].oy + y});
-        box[circle].attr({cx: box[circle].ox + x, cy: box[circle].oy + y});
-      });
-      ['leftLink', 'rightLink'].forEach(function(line) {
-        if (box[line]== undefined)
-          return;
+  var rect = box.rect;
 
-        box[line].translate(x - box[line].ox, y - box[line].oy);
-        box[line].ox = x;
-        box[line].oy = y;
-      });
-    },
-    up = function() {
-      ['rect', 'top', 'left', 'right'].forEach(function(thing) {
-        box[thing].attr({opacity: 1});
-      });
+  box.isMoving = true;
 
-      console.log(box);
-    };
+  // Initial states
+  rect.ox = rect.attr('x');
+  rect.oy = rect.attr('y');
+  rect.attr({opacity: .5});
 
-  rect.drag(move, start, up);
+  // Connector handles
+  ['top', 'left', 'right'].forEach(function(circle) {
+    box[circle].ox = box[circle].attr('cx');
+    box[circle].oy = box[circle].attr('cy');
+    box[circle].attr({opacity: .8});
+  });
+
+  // Connector links
+  ['leftLink', 'rightLink'].forEach(function(line) {
+    if (box[line] != undefined) {
+
+      box[line].ox = 0;
+      box[line].oy = 0;
+      box[line].attr({opacity: .8});
+    }
+  });
+
+  return box;
+}
+
+function move(box, x, y) {
+
+  var rect = box.rect;
+
+  rect.attr({x: rect.ox + x, y: rect.oy + y});
+  rect.attr({x: rect.ox + x, y: rect.oy + y});
+
+  // Connector handles
+  ['top', 'left', 'right'].forEach(function(circle) {
+    box[circle].attr({cx: box[circle].ox + x, cy: box[circle].oy + y});
+    box[circle].attr({cx: box[circle].ox + x, cy: box[circle].oy + y});
+  });
+
+  // Move children as well
+  ['left', 'right'].forEach(function(which) {
+    var link = box[which+'Link'];
+
+    if (link != undefined) {
+
+      link.translate(x - link.ox, y - link.oy);
+      link.ox = x;
+      link.oy = y;
+
+      var child = box[which+'Child'];
+      move(start(child), x, y);
+    }
+  });
+
+  // Move parent link along with child
+  var plink  = box.parentLink;
+  var xSrc  = plink.attrs.path[0][1];
+  var ySrc  = plink.attrs.path[0][2];
+  var xDest = box.top.ox+x;
+  var yDest = box.top.oy+y;
+
+  plink.attr({path: 'M'+xSrc+' '+ySrc+' L'+xDest+' '+yDest});
+
+  return box;
+}
+
+function up(box) {
+  ['rect', 'top', 'left', 'right'].forEach(function(thing) {
+    box[thing].attr({opacity: 1});
+  });
+
+  ['left', 'right'].forEach(function(which) {
+    var child = box[which+'Child'];
+
+    if (child != undefined)
+      up(child);
+  });
+
+  box.isMoving = false;
 
   return box;
 }
