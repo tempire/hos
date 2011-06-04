@@ -5,10 +5,22 @@ body {
   width: 100%;
 }
 
+#header {
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, #629BBA), color-stop(1.0, #53707F));
+  height: 70px;
+  position: relative;
+}
+
 #main {
-  border: solid black 2px;
   height: 600px;
   position: relative;
+}
+
+#right {
+  border: solid black 2px;
+  position: absolute;
+  right: 0px;
+  width: 300px;
 }
 
 div.function {

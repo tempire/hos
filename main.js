@@ -13,33 +13,33 @@ j(function() {
       //create_box(ev.x, ev.y);
   //});
 
-  var w         = create_title_bar(width, height);
-  window.wbar   = w.bar;
-  window.wfname = w.function_name;
+  //var w         = create_title_bar(width, height);
+  //window.wbar   = w.bar;
+  //window.wfname = w.function_name;
 
   create_box(width/2-50, height/2-100);
 });
 
-function create_title_bar(width, height) {
+//function create_title_bar(width, height) {
 
-  var bar = paper.rect(0, 0, width, 60, 0);
+  //var bar = paper.rect(0, 0, width, 60, 0);
 
-  bar.attr({
-    gradient:           '90-#526c7a-#64a0c1',
-    stroke:             '#3b4449',
-    'stroke-width':     3,
-    'stroke-linejoin':  'round',
-  });
+  //bar.attr({
+    //gradient:           '90-#526c7a-#64a0c1',
+    //stroke:             '#3b4449',
+    //'stroke-width':     3,
+    //'stroke-linejoin':  'round',
+  //});
 
-  var function_name = paper.text(width/2, 30, 'Function').attr({
-    'font-family':  'Lucida Grande',
-    'font-weight':  'bold',
-    'font-size':    30,
-    'fill':         'white'
-  });
+  //var function_name = paper.text(width/2, 30, 'Function').attr({
+    //'font-family':  'Lucida Grande',
+    //'font-weight':  'bold',
+    //'font-size':    30,
+    //'fill':         'white'
+  //});
 
-  return {bar: bar, function_name: function_name};
-}
+  //return {bar: bar, function_name: function_name};
+//}
 
 function create_box(x, y) {
 
