@@ -2,47 +2,44 @@ var j = window.j = jQuery;
 
 j(function() {
 
-  var main   = j('#main');
+  var hos = draw_hos(j('#hos'));
+  var dim = hos_dimensions();
+
+  // initial function box
+  create_box(dim.width/2-50, dim.height/2-100);
+});
+
+function hos_dimensions() {
+  var el = j('#hos');
+
+  return {
+    width:  el.width(),
+    height: el.height()
+  };
+}
+
+function draw_hos() {
+  var dim = hos_dimensions();
+
+  // canvas
+  var paper = window.paper = Raphael('hos', dim.width, dim.height);
+  var p = paper.rect(0, 0, dim.width, dim.height).attr({fill: 'white'});
+
+  // resize event
+  j(window).resize(resize_hos);
+
+  return p;
+}
+
+function resize_hos(ev) {
+  var main   = j('#hos');
   var width  = main.width();
   var height = main.height();
 
-  var paper = window.paper = Raphael('main', width, height);
-  var p = paper.rect(0, 0, width, height).attr({fill: 'white'});
-
-  //p.click(function(ev) {
-      //create_box(ev.x, ev.y);
-  //});
-
-  //var w         = create_title_bar(width, height);
-  //window.wbar   = w.bar;
-  //window.wfname = w.function_name;
-
-  create_box(width/2-50, height/2-100);
-});
-
-//function create_title_bar(width, height) {
-
-  //var bar = paper.rect(0, 0, width, 60, 0);
-
-  //bar.attr({
-    //gradient:           '90-#526c7a-#64a0c1',
-    //stroke:             '#3b4449',
-    //'stroke-width':     3,
-    //'stroke-linejoin':  'round',
-  //});
-
-  //var function_name = paper.text(width/2, 30, 'Function').attr({
-    //'font-family':  'Lucida Grande',
-    //'font-weight':  'bold',
-    //'font-size':    30,
-    //'fill':         'white'
-  //});
-
-  //return {bar: bar, function_name: function_name};
-//}
+  paper.setSize(width, height);
+}
 
 function create_box(x, y) {
-
   var width = 150;
 
   var box = {
@@ -65,7 +62,6 @@ function create_box(x, y) {
 }
 
 function set_box_width(box, width) {
-
   box.rect.attr({width: width});
 
   box.top.attr(
@@ -73,17 +69,16 @@ function set_box_width(box, width) {
 
   box.right.attr(
       {cx: box.rect.attr('x')+box.rect.attr('width')});;
+
   return box;
 }
 
 function assign_events(box) {
-
   return assign_drag_events(
     box, assign_child_spawn_events(box));
 }
 
 function link_to_parent(box, which, child) {
-
   var parent = box[which];
 
   box[which + 'Child'] = child;
@@ -115,7 +110,6 @@ function link_to_parent(box, which, child) {
 }
 
 function assign_child_spawn_events(box) {
-
   var left  = box.left;
   var right = box.right;
 
@@ -146,7 +140,6 @@ function assign_child_spawn_events(box) {
 }
 
 function assign_drag_events(box) {
-
   var rect  = box.rect;
 
   rect.drag(
@@ -159,7 +152,6 @@ function assign_drag_events(box) {
 }
 
 function start(box) {
-
   if (box.isMoving) return box;
 
   var rect = box.rect;
@@ -192,7 +184,6 @@ function start(box) {
 }
 
 function move(box, x, y) {
-
   var rect = box.rect;
 
   rect.attr({x: rect.ox + x, y: rect.oy + y});

@@ -1,6 +1,7 @@
-body {
+html, body {
   font-family: "Lucida Grande", tahoma, sans-serif;
   font-size: 100%;
+  height: 100%;
   margin: 0;
   width: 100%;
 }
@@ -14,6 +15,11 @@ body {
 #main {
   height: 600px;
   position: relative;
+}
+
+#hos {
+  height: 100%;
+  width: 100%;
 }
 
 #right {
