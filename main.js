@@ -76,8 +76,10 @@ function pulsate_handler(box, which) {
   var current = circle.attr('r');
 
   circle.animate({
-    '20%': {r: current+2},
-    '100%': {r: current}
+    '10%': {r: current+2},
+    '80%': {r: current+8},
+    '85%': {r: current+5},
+    '100%': {r: current},
   }, 200);
 }
 
