@@ -5,6 +5,10 @@ html, body {
   margin: 0;
   width: 100%;
 }
+form {
+  padding: 0;
+  margin: 0;
+}
 
 #header {
   background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, #629BBA), color-stop(1.0, #53707F));
@@ -47,5 +51,10 @@ div.function a.right {
   right: 1px;
 }
 
-div.function_overlay {
+div.function_overlay input {
+  background-color: transparent;
+  border: 0;
+  font-size: 1.2em;
+  text-align: center;
+  color: white;
 }

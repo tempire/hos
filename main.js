@@ -52,7 +52,9 @@ function draw_hos() {
   return p;
 }
 
-function create_function_window(width, height) {
+function create_fname_prompt(box) {
+  var dim  = box_dimensions(box);
+  var text = box.text;
 
   var set = j('\
     <div class="function_overlay">          \
@@ -61,11 +63,25 @@ function create_function_window(width, height) {
       </form>                               \
     </div>');
 
-  set.css('text-align', 'center');
-  set.css('width', width);
-  set.css('height', height);
+  set
+    .css('text-align', 'center')
+    .css('width', dim.width)
+    .css('height', dim.height)
+    .css('margin-top', 15);
+
+  set.find('input')
+    .css('width', dim.width);
+
+  if (text != undefined)
+    set.find('input').val(text.attr('text'));
 
   set.find('form').unbind('submit').submit(function(ev) {
+    var name = j(this).find('input').val();
+    if (name == '') return;
+
+    box.text = create_function_name(box, name);
+    j(this).parent('.function_overlay').remove();
+    return false;
   });
 
   // Remove function overlay on blur
@@ -87,6 +103,11 @@ function create_function_name(box, name) {
   var text = paper.text(x, y, name).attr({
     fill: 'white',
     font: '20px tahoma'
+  });
+
+  text.dblclick(function(ev) {
+    display_fname_prompt(box, text.attr('text'));
+    this.remove();
   });
 
   return text;
@@ -111,7 +132,8 @@ function create_box(x, y) {
     right: paper.circle(x+width, y+height, 7).attr({fill: 'red'})
   };
 
-  box.text = create_function_name(box, 'function name');
+  //box.text = create_function_name(box, 'function name');
+  display_fname_prompt(box);
 
   //set_box_width(box, width);
 
@@ -157,27 +179,32 @@ function assign_events(box) {
 
 function assign_info_events(box) {
   var rect = box.rect;
-  var dim  = box_dimensions(box);
 
   rect.dblclick(function(ev) {
-
-    var div = create_function_window(dim.width, dim.height);
-
-    // Set position over box
-    div.css({
-      position: 'absolute',
-      left: rect.attr('x'),
-      top: rect.attr('y')
-    });
-
-    // Assign in hos window
-    j('#hos').append(div);
-
-    // Accept function name immeidately
-    div.find('input').focus();
+    display_fname_prompt(box);
   });
 
   return box;
+}
+
+function display_fname_prompt(box) {
+  var rect    = box.rect;
+
+  var div     = create_fname_prompt(box);
+  box.prompt  = div;
+
+  // Set position over box
+  div.css({
+    position: 'absolute',
+    left:     rect.attr('x'),
+    top:      rect.attr('y')
+  });
+
+  // Assign in hos window
+  j('#hos').append(div);
+
+  // Accept function name immeidately
+  div.find('input').focus();
 }
 
 function link_to_parent(box, which, child) {
@@ -257,8 +284,9 @@ function assign_drag_events(box) {
 function start(box) {
   if (box.isMoving) return box;
 
-  var rect = box.rect;
-  var text = box.text;
+  var rect    = box.rect;
+  var text    = box.text;
+  var prompt  = box.prompt;
 
   box.isMoving = true;
 
@@ -270,8 +298,16 @@ function start(box) {
   rect.attr({opacity: .5});
 
   // Function name
-  text.ox = text.attr('x');
-  text.oy = text.attr('y');
+  if (text != undefined) {
+    text.ox = text.attr('x');
+    text.oy = text.attr('y');
+  }
+
+  // Prompt
+  if (prompt != undefined) {
+    prompt.data('ox', prompt.css('left'));
+    prompt.data('oy', prompt.css('top'));
+  }
 
   // Connector handles
   ['top', 'left', 'right'].forEach(function(circle) {
@@ -294,14 +330,23 @@ function start(box) {
 }
 
 function move(box, x, y) {
-  var rect = box.rect;
-  var text = box.text;
+  var rect   = box.rect;
+  var text   = box.text;
+  var prompt = box.prompt;
 
   // Move rect
-  rect.attr({x: rect.ox + x, y: rect.oy + y});
+  rect.attr({x: rect.ox+x, y: rect.oy+y});
 
   // Move function name
-  text.attr({x: text.ox+x, y: text.oy+y});
+  if (text != undefined) 
+    text.attr({x: text.ox+x, y: text.oy+y});
+ 
+  // Move prompt
+  if (prompt != undefined) {
+    prompt
+      .css('left', parseInt(prompt.data('ox'))+x)
+      .css('top', parseInt(prompt.data('oy'))+y);
+  }
 
   // Move connector handles
   ['top', 'left', 'right'].forEach(function(circle) {
