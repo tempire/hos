@@ -7,10 +7,13 @@ j(function() {
   var dim = hos_dimensions();
 
   // initial function box
-  create_box(dim.width/2-50, dim.height/2-100);
+  var box = create_box(dim.width/2-50, dim.height/2-100);
+  pulsate_handler(box, 'right');
+  pulsate_handler(box, 'left');
 
   // object for right info bar
-  infobar = new InfoBar(j('#infobar'), hos);
+  var bar = j('#infobar');
+  infobar = new InfoBar(bar, hos);
 
   // create input for current function
   infobar.create_input();
@@ -66,6 +69,16 @@ function create_box(x, y) {
   });
 
   return assign_events(box);
+}
+
+function pulsate_handler(box, which) {
+  var circle = box[which];
+  var current = circle.attr('r');
+
+  circle.animate({
+    '20%': {r: current+2},
+    '100%': {r: current}
+  }, 200);
 }
 
 function set_box_width(box, width) {
