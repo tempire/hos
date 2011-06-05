@@ -22,7 +22,7 @@ html, body {
   width: 100%;
 }
 
-#right {
+#infobar {
   border: solid black 2px;
   position: absolute;
   right: 0px;

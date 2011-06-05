@@ -1,12 +1,19 @@
-var j = window.j = jQuery;
+var j       = window.j = jQuery;
+var paper   = window.paper = {};
+var infobar = window.infobar = {};
 
 j(function() {
-
   var hos = draw_hos(j('#hos'));
   var dim = hos_dimensions();
 
   // initial function box
   create_box(dim.width/2-50, dim.height/2-100);
+
+  // object for right info bar
+  infobar = new InfoBar(j('#infobar'), hos);
+
+  // create input for current function
+  infobar.create_input();
 });
 
 function hos_dimensions() {
@@ -22,7 +29,7 @@ function draw_hos() {
   var dim = hos_dimensions();
 
   // canvas
-  var paper = window.paper = Raphael('hos', dim.width, dim.height);
+  paper = window.paper = Raphael('hos', dim.width, dim.height);
   var p = paper.rect(0, 0, dim.width, dim.height).attr({fill: 'white'});
 
   // resize event
