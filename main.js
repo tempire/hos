@@ -28,6 +28,16 @@ function hos_dimensions() {
   };
 }
 
+function box_dimensions(box) {
+  var rect = box.rect;
+  var dim  = rect.getBBox();
+
+  return {
+    width:  dim.width,
+    height: dim.height
+  };
+}
+
 function draw_hos() {
   var dim = hos_dimensions();
 
@@ -39,6 +49,20 @@ function draw_hos() {
   j(window).resize(resize_hos);
 
   return p;
+}
+
+function create_function_window(width, height) {
+
+  var set = j('\
+    <div class="function_overlay">       \
+      <input type="text" name="input" /> \
+    </div>');
+
+  set.css('text-align', 'center');
+  set.css('width', width);
+  set.css('height', height);
+
+  return set;
 }
 
 function resize_hos(ev) {
@@ -96,8 +120,36 @@ function set_box_width(box, width) {
 }
 
 function assign_events(box) {
-  return assign_drag_events(
-    box, assign_child_spawn_events(box));
+
+  return assign_info_events(
+      assign_drag_events(
+        assign_child_spawn_events(box)));
+}
+
+function assign_info_events(box) {
+  var rect = box.rect;
+  var dim  = box_dimensions(box);
+
+  rect.dblclick(function(ev) {
+
+    var div = create_function_window(dim.width, dim.height);
+
+    // Set position over box
+    div.css({
+      position: 'absolute',
+      left: rect.attr('x'),
+      top: rect.attr('y')
+    });
+
+    // Assign in hos window
+    j('#hos').append(div);
+
+    // Accept function name immeidately
+    div.find('input').focus();
+
+  });
+
+  return box;
 }
 
 function link_to_parent(box, which, child) {
