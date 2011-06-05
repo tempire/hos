@@ -14,6 +14,8 @@ function InfoBar(bar, hos) {
     set.appendTo(bar);
 
     this.assign_input_handler(set.find('input'));
+
+    return set.find('input');
   };
 
   this.assign_input_handler = function(elem) {
@@ -24,7 +26,7 @@ function InfoBar(bar, hos) {
           if (!bar.find('input:last').is(ev.currentTarget)) return; // Not last input element
           if (j(ev.currentTarget).val() == '') return; // No current input name
 
-          that.create_input();
+          that.create_input().focus();
         });
   }
 }
