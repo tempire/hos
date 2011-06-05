@@ -8,6 +8,7 @@ j(function() {
 
   // initial function box
   var box = create_box(dim.width/2-50, dim.height/2-100);
+
   pulsate_handler(box, 'right');
   pulsate_handler(box, 'left');
 
@@ -54,15 +55,41 @@ function draw_hos() {
 function create_function_window(width, height) {
 
   var set = j('\
-    <div class="function_overlay">       \
-      <input type="text" name="input" /> \
+    <div class="function_overlay">          \
+      <form>                                \
+        <input type="text" name="input" />  \
+      </form>                               \
     </div>');
 
   set.css('text-align', 'center');
   set.css('width', width);
   set.css('height', height);
 
+  set.find('form').unbind('submit').submit(function(ev) {
+  });
+
+  // Remove function overlay on blur
+  set.find('input').blur(function(ev) {
+    j(this).parent('.function_overlay').remove();
+  });
+
   return set;
+}
+
+function create_function_name(box, name) {
+  var rect   = box.rect;
+  var width  = rect.attr('width');
+  var height = rect.attr('height');
+
+  var x = rect.attr('x')+width/2;
+  var y = rect.attr('y')+height/2;
+
+  var text = paper.text(x, y, name).attr({
+    fill: 'white',
+    font: '20px tahoma'
+  });
+
+  return text;
 }
 
 function resize_hos(ev) {
@@ -74,14 +101,17 @@ function resize_hos(ev) {
 }
 
 function create_box(x, y) {
-  var width = 150;
+  var width  = 150;
+  var height = 50;
 
   var box = {
-    rect:  paper.rect(x, y, width, 50, 10).attr({fill: 'green'}),
+    rect:  paper.rect(x, y, width, height, 10).attr({fill: 'green'}),
     top:   paper.circle(x+width/2, y+0, 7).attr({fill: 'red'}),
-    left:  paper.circle(x+0, y+50, 7).attr({fill: 'red'}),
-    right: paper.circle(x+width, y+50, 7).attr({fill: 'red'})
+    left:  paper.circle(x+0, y+height, 7).attr({fill: 'red'}),
+    right: paper.circle(x+width, y+height, 7).attr({fill: 'red'})
   };
+
+  box.text = create_function_name(box, 'function name');
 
   //set_box_width(box, width);
 
@@ -101,8 +131,7 @@ function pulsate_handler(box, which) {
 
   circle.animate({
     '10%': {r: current+2},
-    '80%': {r: current+8},
-    '85%': {r: current+5},
+    '50%': {r: current+5},
     '100%': {r: current},
   }, 200);
 }
@@ -146,7 +175,6 @@ function assign_info_events(box) {
 
     // Accept function name immeidately
     div.find('input').focus();
-
   });
 
   return box;
@@ -179,6 +207,7 @@ function link_to_parent(box, which, child) {
 
   child.top.toFront();
   box.rect.toFront();
+  box.text.toFront();
   box.right.toFront();
   box.left.toFront();
 }
@@ -229,13 +258,20 @@ function start(box) {
   if (box.isMoving) return box;
 
   var rect = box.rect;
+  var text = box.text;
 
   box.isMoving = true;
 
-  // Initial states
+  // Record initial states
+
+  // Rect
   rect.ox = rect.attr('x');
   rect.oy = rect.attr('y');
   rect.attr({opacity: .5});
+
+  // Function name
+  text.ox = text.attr('x');
+  text.oy = text.attr('y');
 
   // Connector handles
   ['top', 'left', 'right'].forEach(function(circle) {
@@ -259,17 +295,21 @@ function start(box) {
 
 function move(box, x, y) {
   var rect = box.rect;
+  var text = box.text;
 
-  rect.attr({x: rect.ox + x, y: rect.oy + y});
+  // Move rect
   rect.attr({x: rect.ox + x, y: rect.oy + y});
 
-  // Connector handles
+  // Move function name
+  text.attr({x: text.ox+x, y: text.oy+y});
+
+  // Move connector handles
   ['top', 'left', 'right'].forEach(function(circle) {
     box[circle].attr({cx: box[circle].ox + x, cy: box[circle].oy + y});
     box[circle].attr({cx: box[circle].ox + x, cy: box[circle].oy + y});
   });
 
-  // Move children as well
+  // Move children
   ['left', 'right'].forEach(function(which) {
     var link = box[which+'Link'];
 
